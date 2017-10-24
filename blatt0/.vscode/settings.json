@@ -1,0 +1,7 @@
+{
+    "editor.fontSize": 19,
+    "haskell.ghcMod.check": "off",
+    "haskell.hlint.logLevel": "none",
+    "haskell.hlint.run": "never",
+    "terminal.integrated.fontSize": 20
+}
