@@ -10,7 +10,7 @@ The following program prints the first ten cubic numbers.
 ```python
 i = 1
 while (i - 10) {
-  print i * i
+  print i * i * i
   i = i - (0 - 1)
 }
 ```
