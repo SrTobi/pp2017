@@ -77,7 +77,7 @@ public class Compiler {
 
 
 		// generate jasm
-		CodeGenVisitor codeGen = new CodeGenVisitor(className, vars, true);
+		CodeGenVisitor codeGen = new CodeGenVisitor(className, vars, false);
 		verbose("Generate jasm...");
 		ast.apply(codeGen);
 		String jasm = codeGen.toString();

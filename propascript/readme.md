@@ -1,0 +1,75 @@
+# PropaScript
+
+Propascript is a simple, but turing complete programming language which is designed yield an easy but complete jvm bytecode compiler.
+
+## Example
+
+The language supports variables, substraction, multiplication, control flow and printing.
+
+The following program prints the first ten cubic numbers.
+```
+i = 1
+while (i - 10) {
+  print i * i
+  i = i - (0 - 1)
+}
+```
+
+The resulting bytecode is
+
+```
+.class public cubics
+.super java/lang/Object
+
+.method public <init>()V
+    aload_0
+    invokenonvirtual java/lang/Object/<init>()V
+    return
+.end method
+
+.method public static main([Ljava/lang/String;)V
+    .limit stack 4
+    .limit locals 1
+
+    ; Initialize local variables
+    iconst_0
+    istore 0
+
+    ; i = 1;
+    ldc 1
+    dup
+    istore 0   ; i = 1
+    pop
+
+    ; while i - 10
+  while0:
+    iload 0    ; Load i
+    ldc 10
+    isub       ; i - 10
+    ifeq end1
+
+    ; print i * i * i;
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    iload 0    ; Load i
+    iload 0    ; Load i
+    iload 0    ; Load i
+    imul       ; i * i
+    imul       ; i * i * i
+    invokevirtual java/io/PrintStream/println(I)V
+
+    ; i = i - 0 - 1;
+    iload 0    ; Load i
+    ldc 0
+    ldc 1
+    isub       ; 0 - 1
+    isub       ; i - 0 - 1
+    dup
+    istore 0   ; i = i - 0 - 1
+    pop
+
+    goto while0
+
+  end1:
+    return
+.end method
+```
