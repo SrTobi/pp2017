@@ -1,0 +1,5 @@
+package propascript;
+
+public enum TokenType {
+	IDENTIFIER, NUMBER, WHILE, CURLY_RIGHT, CURLY_LEFT, BRACKET_RIGHT, BRACKET_LEFT, ASSIGN, MINUS, MUL, PRINT, EOS, EOF;
+}
