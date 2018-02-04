@@ -7,7 +7,7 @@ Propascript is a simple, but turing complete programming language which is desig
 The language supports variables, substraction, multiplication, control flow and printing.
 
 The following program prints the first ten cubic numbers.
-```
+```python
 i = 1
 while (i - 10) {
   print i * i
@@ -17,7 +17,7 @@ while (i - 10) {
 
 The resulting bytecode is
 
-```
+```jasmin
 .class public cubics
 .super java/lang/Object
 
