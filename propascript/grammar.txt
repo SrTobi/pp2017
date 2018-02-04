@@ -1,12 +1,12 @@
 
-// tokens are if ( ) { } Number Identifier = * + print eos
+// tokens are while ( ) { } Number Identifier = * - print eos
 
 
 Program -> Statements eof
 
 Statements -> Statement eos Statements | ε
 
-Statement -> "if" Expr { Statements } |
+Statement -> "while" Expr { Statements } |
              Expr |
              print Expr
 
