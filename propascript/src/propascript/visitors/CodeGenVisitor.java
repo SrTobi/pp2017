@@ -1,6 +1,7 @@
 package propascript.visitors;
 
 import propascript.ast.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 import java.util.Map;
@@ -109,28 +110,14 @@ public class CodeGenVisitor implements Visitor {
 	@Override
 	public void visit(ExprStatement stmt) {
 		comment(stmt.toString());
-		allocStack(1);
-		stmt.getExpr().apply(this);
-		inst("pop");
-		deallocStack(1);
 		ln();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void visit(WhileStatement stmt) {
 		comment("while " + stmt.getCondition());
-		allocStack(1);
-		String condLabel = "while" + nextLabelId++;
-		label(condLabel);
-		stmt.getCondition().apply(this);
-		String endLabel = "end" + nextLabelId++;
-		inst("ifeq " + endLabel);
-		deallocStack(1);
-		ln();
-		visitStatements(stmt.getStatements());
-		inst("goto " + condLabel);
-		ln();
-		label(endLabel);
+		throw new NotImplementedException();
 	}
 
 	@Override
@@ -146,44 +133,27 @@ public class CodeGenVisitor implements Visitor {
 
 	@Override
 	public void visit(AssignExpr expr) {
-		int id = vars.get(expr.getLeft().getIdentifier());
-		commentVerbose("begin " + expr);
-		expr.getRight().apply(this);
-		allocStack(1);
-		inst("dup");
-		inst("istore " + id, expr.toString());
-		deallocStack(1);
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void visit(SubExpr expr) {
-		commentVerbose("begin " + expr);
-		expr.getLeft().apply(this);
-		allocStack(1);
-		expr.getRight().apply(this);
-		inst("isub", expr.toString());
-		deallocStack(1);
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void visit(MulExpr expr) {
-		commentVerbose("begin " + expr);
-		expr.getLeft().apply(this);
-		allocStack(1);
-		expr.getRight().apply(this);
-		inst("imul", expr.toString());
-		deallocStack(1);
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void visit(Constant expr) {
-		inst("ldc " + expr.getValue());
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public void visit(Variable expr) {
-		int idx = vars.get(expr.getIdentifier());
-		inst("iload " + idx, "Load " + expr.getIdentifier());
+		throw new NotImplementedException();
 	}
 
 	@Override
