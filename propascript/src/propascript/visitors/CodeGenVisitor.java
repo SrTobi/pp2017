@@ -10,7 +10,7 @@ public class CodeGenVisitor implements Visitor {
 	private final Map<String, Integer> vars;
 	private final boolean verbose;
 	private StringBuilder builder = new StringBuilder();
-	private int maxStack = 0;
+	private int maxStack = 1;
 	private int curStack = 0;
 	private int nextLabelId = 0;
 
@@ -148,8 +148,8 @@ public class CodeGenVisitor implements Visitor {
 	public void visit(AssignExpr expr) {
 		int id = vars.get(expr.getLeft().getIdentifier());
 		commentVerbose("begin " + expr);
-		allocStack(1);
 		expr.getRight().apply(this);
+		allocStack(1);
 		inst("dup");
 		inst("istore " + id, expr.toString());
 		deallocStack(1);
@@ -158,8 +158,8 @@ public class CodeGenVisitor implements Visitor {
 	@Override
 	public void visit(SubExpr expr) {
 		commentVerbose("begin " + expr);
-		allocStack(1);
 		expr.getLeft().apply(this);
+		allocStack(1);
 		expr.getRight().apply(this);
 		inst("isub", expr.toString());
 		deallocStack(1);
@@ -168,8 +168,8 @@ public class CodeGenVisitor implements Visitor {
 	@Override
 	public void visit(MulExpr expr) {
 		commentVerbose("begin " + expr);
-		allocStack(1);
 		expr.getLeft().apply(this);
+		allocStack(1);
 		expr.getRight().apply(this);
 		inst("imul", expr.toString());
 		deallocStack(1);
