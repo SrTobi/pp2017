@@ -18,11 +18,13 @@ import java.util.stream.Collectors;
 
 public class Compiler {
 	private final boolean printAst;
+	private final boolean printTokens;
 	private final boolean terminalMode;
 	private final boolean verbose;
 
-	public Compiler(boolean printAst, boolean terminalMode, boolean verbose) {
+	public Compiler(boolean printAst, boolean printTokens, boolean terminalMode, boolean verbose) {
 		this.printAst = printAst;
+		this.printTokens = printTokens;
 		this.terminalMode = terminalMode;
 		this.verbose = verbose;
 	}
@@ -52,6 +54,20 @@ public class Compiler {
 		Program ast = null;
 		try {
 			Lexer lexer = new Lexer(source);
+			boolean wasEos = true;
+
+			if (printTokens) {
+				while (lexer.getType() != TokenType.EOF) {
+					if (!(lexer.getType() == TokenType.EOS && wasEos)) {
+						lexer.printCurToken();
+					}
+					wasEos = lexer.getType() == TokenType.EOS;
+					lexer.nextToken();
+				}
+				System.out.println("EOF");
+				return;
+			}
+
 			Parser parser = new Parser(lexer);
 			verbose("Parsing...");
 			ast = parser.parse();
@@ -130,10 +146,11 @@ public class Compiler {
 		// nonoptions
 		if (nonoptions.length <= 0 || options.contains("-h")) {
 			System.out.println("Usage:");
-			System.out.println("  prapac <input file> [<output file>] [<output class file>]");
+			System.out.println("  prapac <input file> [<output file>]");
 			System.out.println();
 			System.out.println("Options:");
 			System.out.println("  -h     This help");
+			System.out.println("  -tok   Print tokens");
 			System.out.println("  -ast   Prints the parsed ast");
 			System.out.println("  -tty   Only output jasm on the terminal");
 			System.out.println("  -v     Verbose mode");
@@ -153,11 +170,12 @@ public class Compiler {
 
 		// options
 		boolean printAst = options.contains("-ast");
+		boolean printTokens = options.contains("-tok");
 		boolean terminalMode = options.contains("-tty");
 		boolean verbose = options.contains("-v");
 
 		String className = classOutput.getFileName().toString().replaceFirst("\\.[^.]+$", "");
-		Compiler compiler = new Compiler(printAst, terminalMode, verbose);
+		Compiler compiler = new Compiler(printAst, printTokens, terminalMode, verbose);
 		compiler.compile(className, sourcePath, jasmOutput, classOutput);
 	}
 }

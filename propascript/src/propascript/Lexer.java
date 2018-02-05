@@ -127,4 +127,21 @@ public class Lexer {
 	public int getLine() {
 		return curLine;
 	}
+
+	public void printCurToken() {
+		System.out.print(getType());
+
+		switch (getType()) {
+			case IDENTIFIER:
+				System.out.print("<" + getValue() + ">");
+				break;
+			case NUMBER:
+				System.out.print("<" + getIntValue() + ">");
+				break;
+			default:
+				break;
+		}
+
+		System.out.println();
+	}
 }
