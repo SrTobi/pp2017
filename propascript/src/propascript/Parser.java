@@ -39,40 +39,87 @@ public class Parser {
 
 	private List<Statement> parseStatements() throws ParseException {
 		List<Statement> statements = new ArrayList<>();
-		// not implemented
+
+		while (lexer.getType() != EOF && lexer.getType() != CURLY_RIGHT) {
+			Statement stmt = parseStatement();
+			if (stmt != null) {
+				statements.add(stmt);
+			}
+			consume(EOS);
+		}
+
 		return statements;
 	}
 
 	private Statement parseStatement() throws ParseException {
-		throw new NotImplementedException();
+		switch (lexer.getType()) {
+			case WHILE:
+				lexer.nextToken();
+				Expr condition = parseAssignExpr();
+				consume(CURLY_LEFT);
+				List<Statement> statements = parseStatements();
+				consume(CURLY_RIGHT);
+				return new WhileStatement(condition, statements);
+			case PRINT:
+				lexer.nextToken();
+				return new PrintStatement(parseAssignExpr());
+			case EOS:
+				return null;
+			default:
+				return new ExprStatement(parseAssignExpr());
+		}
 	}
-
-	private Statement parsePrint() throws ParseException {
-		throw new NotImplementedException();
-	}
-
-
-	private WhileStatement parseWhile() throws ParseException {
-		throw new NotImplementedException();
-	}
-
-	private Expr parseExpr() throws ParseException {
-		throw new NotImplementedException();
-	}
-
 	private Expr parseAssignExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseMinusExpr();
+		if (lexer.getType() == ASSIGN) {
+			if (!(left instanceof Variable)) {
+				error("can't handle non variable assignment target");
+			}
+			lexer.nextToken();
+			Expr right = parseAssignExpr();
+			return new AssignExpr((Variable)left, right);
+		}
+		return left;
 	}
 
 	private Expr parseMinusExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseMulExpr();
+		if (lexer.getType() == MINUS) {
+			lexer.nextToken();
+			Expr right = parseMinusExpr();
+			return new SubExpr(left, right);
+		}
+		return left;
 	}
 
 	private Expr parseMulExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseValue();
+		if (lexer.getType() == MUL) {
+			lexer.nextToken();
+			Expr right = parseMulExpr();
+			return new MulExpr(left, right);
+		}
+		return left;
 	}
 
 	private Expr parseValue() throws ParseException {
-		throw new NotImplementedException();
+		switch (lexer.getType()) {
+			case BRACKET_LEFT:
+				lexer.nextToken();
+				Expr expr = parseAssignExpr();
+				consume(BRACKET_RIGHT);
+				return expr;
+			case IDENTIFIER:
+				Variable var = new Variable(lexer.getValue());
+				lexer.nextToken();
+				return var;
+			case NUMBER:
+				Constant c = new Constant(lexer.getIntValue());
+				lexer.nextToken();
+				return c;
+			default:
+				error("expected (, identifier or number but found " + lexer.getType());
+				return null;
+		}
 	}
 }

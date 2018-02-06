@@ -11,30 +11,41 @@ public class VariableCollector implements Visitor {
 
 	@Override
 	public void visit(Program program) {
+		program.getStatements().forEach((stmt) -> stmt.apply(this));
 	}
 
 	@Override
 	public void visit(ExprStatement stmt) {
+		stmt.getExpr().apply(this);
 	}
 
 	@Override
 	public void visit(WhileStatement stmt) {
+		stmt.getCondition().apply(this);
+		stmt.getStatements().forEach((s) -> s.apply(this));
 	}
 
 	@Override
 	public void visit(PrintStatement stmt) {
+		stmt.getExpr().apply(this);
 	}
 
 	@Override
 	public void visit(AssignExpr expr) {
+		expr.getLeft().apply(this);
+		expr.getRight().apply(this);
 	}
 
 	@Override
 	public void visit(SubExpr expr) {
+		expr.getLeft().apply(this);
+		expr.getRight().apply(this);
 	}
 
 	@Override
 	public void visit(MulExpr expr) {
+		expr.getLeft().apply(this);
+		expr.getRight().apply(this);
 	}
 
 	@Override
@@ -44,6 +55,9 @@ public class VariableCollector implements Visitor {
 
 	@Override
 	public void visit(Variable expr) {
+		if (!vars.containsKey(expr.getIdentifier())) {
+			vars.put(expr.getIdentifier(), nextIdx++);
+		}
 	}
 
 	public Map<String, Integer> getVars() {
