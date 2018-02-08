@@ -85,7 +85,7 @@ public class CodeGenVisitor implements Visitor {
 		// we don't know the stack limit yet... we will replace this later
 		// with the actual stack size
 		inst(".limit stack $$[stack-limit]$$");
-		inst(".limit locals " + vars.size());
+		inst(".limit locals " + Math.max(1, vars.size()));
 		ln();
 
 		// initialize local variables
@@ -110,8 +110,11 @@ public class CodeGenVisitor implements Visitor {
 	@Override
 	public void visit(ExprStatement stmt) {
 		comment(stmt.toString());
+		allocStack(1);
+		stmt.getExpr().apply(this);
+		inst("pop");
+		deallocStack(1);
 		ln();
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -133,27 +136,39 @@ public class CodeGenVisitor implements Visitor {
 
 	@Override
 	public void visit(AssignExpr expr) {
-		throw new NotImplementedException();
+		expr.getRight().apply(this);
+		allocStack(1);
+		inst("dup");
+		inst("istore " + vars.get(expr.getLeft().getIdentifier()));
+		deallocStack(1);
 	}
 
 	@Override
 	public void visit(SubExpr expr) {
-		throw new NotImplementedException();
+		expr.getLeft().apply(this);
+		allocStack(1);
+		expr.getRight().apply(this);
+		inst("isub", expr.toString());
+		deallocStack(1);
 	}
 
 	@Override
 	public void visit(MulExpr expr) {
-		throw new NotImplementedException();
+		expr.getLeft().apply(this);
+		allocStack(1);
+		expr.getRight().apply(this);
+		inst("imul", expr.toString());
+		deallocStack(1);
 	}
 
 	@Override
 	public void visit(Constant expr) {
-		throw new NotImplementedException();
+		inst("ldc " + expr.getValue());
 	}
 
 	@Override
 	public void visit(Variable expr) {
-		throw new NotImplementedException();
+		inst("iload " + vars.get(expr.getIdentifier()), expr.toString());
 	}
 
 	@Override

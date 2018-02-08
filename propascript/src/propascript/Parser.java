@@ -1,6 +1,7 @@
 package propascript;
 
 
+import jas.Var;
 import propascript.ast.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -39,40 +40,92 @@ public class Parser {
 
 	private List<Statement> parseStatements() throws ParseException {
 		List<Statement> statements = new ArrayList<>();
-		// not implemented
+
+		while (lexer.getType() != EOF && lexer.getType() != CURLY_RIGHT) {
+			Statement stmt = parseStatement();
+			if (stmt != null) {
+				statements.add(stmt);
+			}
+			consume(EOS);
+		}
+
 		return statements;
 	}
 
 	private Statement parseStatement() throws ParseException {
-		throw new NotImplementedException();
-	}
-
-	private Statement parsePrint() throws ParseException {
-		throw new NotImplementedException();
-	}
-
-
-	private WhileStatement parseWhile() throws ParseException {
-		throw new NotImplementedException();
+		switch (lexer.getType()) {
+			case EOS:
+				return null;
+			case PRINT:
+				lexer.nextToken();
+				return new PrintStatement(parseExpr());
+			case WHILE:
+				lexer.nextToken();
+				Expr condition = parseExpr();
+				consume(CURLY_LEFT);
+				List<Statement> stmts = parseStatements();
+				consume(CURLY_RIGHT);
+				return new WhileStatement(condition, stmts);
+			default:
+				return new ExprStatement(parseExpr());
+		}
 	}
 
 	private Expr parseExpr() throws ParseException {
-		throw new NotImplementedException();
+		return parseAssignExpr();
 	}
 
 	private Expr parseAssignExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseMinusExpr();
+		if (lexer.getType() == ASSIGN) {
+			lexer.nextToken();
+			if (!(left instanceof Variable)) {
+				error("Can't assign to non assignable expression");
+			}
+			Expr right = parseAssignExpr();
+			return new AssignExpr((Variable)left, right);
+		}
+		return left;
 	}
 
 	private Expr parseMinusExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseMulExpr();
+		if (lexer.getType() == MINUS) {
+			lexer.nextToken();
+			Expr right = parseMinusExpr();
+			return new SubExpr(left, right);
+		}
+		return left;
 	}
 
 	private Expr parseMulExpr() throws ParseException {
-		throw new NotImplementedException();
+		Expr left = parseValue();
+		if (lexer.getType() == MUL) {
+			lexer.nextToken();
+			Expr right = parseMulExpr();
+			return new MulExpr(left, right);
+		}
+		return left;
 	}
 
 	private Expr parseValue() throws ParseException {
-		throw new NotImplementedException();
+		switch (lexer.getType()) {
+			case BRACKET_LEFT:
+				lexer.nextToken();
+				Expr expr = parseExpr();
+				consume(BRACKET_RIGHT);
+				return expr;
+			case IDENTIFIER:
+				String id = lexer.getValue();
+				lexer.nextToken();
+				return new Variable(id);
+			case NUMBER:
+				int num = lexer.getIntValue();
+				lexer.nextToken();
+				return new Constant(num);
+			default:
+				error("expected (, identifier, number but found " + lexer.getType());
+				return null;
+		}
 	}
 }
